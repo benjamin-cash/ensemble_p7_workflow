@@ -35,7 +35,7 @@ sed -i "s/MMs/$MMs/g" diag_table
 sed -i "s/DDs/$DDs/g" diag_table
 #
 #echo "Edit input.nml"
-#sed -i "s/ISEED_CA/$ISEED_CA/g" input.nml
+sed -i "s/ISEED_CA/$ISEED_CA/g" input.nml
 #
 echo "Edit model_configure"
 sed -i "s/YYYYs/$YYYYs/g" model_configure

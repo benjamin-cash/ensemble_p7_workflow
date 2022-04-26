@@ -6,82 +6,94 @@
      mem = mem002,mem008
 
 [scheduling]
-    [[dependencies]]
-	    graph = est_run_dir<ldate,mem> => STAGE_FILES:succeed-all => run_model<ldate,mem>
+    cycling mode = integer
+    initial cycle point = 1
+    final cycle point = 2
+    [[graph]]
+       R1 = "est_run_dir<ldate,mem> => STAGE_FILES:succeed-all => expand_templates<ldate,mem> => run_model<ldate,mem> => update_restart<ldate,mem>"
+       P1 = """
+                run_model<ldate,mem>=>update_restart<ldate,mem>
+                update_restart<ldate,mem>[-P1] => run_model<ldate,mem>
+   
 [runtime]
     [[FILE_PATHS_ENV]]
-	    [[[environment]]]
+	[[[environment]]]
           CYLC_INPUT_ROOT_DIR="/scratch/02441/bcash/ufs_input/prototype-7"
-          CYLC_RUN_ROOT_DIR="/scratch/02441/bcash/FV3_CYLC/ensemble-p7/run"
-     		  CYLC_NHOURS = 840
-		      CYLC_USERID = bcash
+          CYLC_RUN_ROOT_DIR="/scratch/02441/bcash/FV3_CYLC/ensemble-p7/${CYLC_WORKFLOW_ID}"
+     	  CYLC_NHOURS = 6
+	  CYLC_USERID = bcash
 
     [[STAGE_FILES]]
-  	  inherit = FILE_PATHS_ENV
+    	inherit = FILE_PATHS_ENV
  
     [[est_run_dir<ldate,mem>]]
-      inherit = FILE_PATHS_ENV
-      script = "bash establish_run_directory.sh"
+    	inherit = FILE_PATHS_ENV
+	script = "bash establish_run_directory.sh"
  
     [[copy_exec_fixed_files<ldate,mem>]]
-      inherit = STAGE_FILES
-      script = "bash stage_model_files.sh"
-	    [[[environment]]]
-		     SUBDIR = "EXEC"
+    	inherit = STAGE_FILES
+	script = "bash stage_model_files.sh"
+		[[[environment]]]
+	    	SUBDIR = "EXEC"
 	
     [[copy_fv3_fixed_files<ldate,mem>]]
       inherit = STAGE_FILES
       script = "bash stage_model_files.sh"
-	    [[[environment]]]
-		    SUBDIR ="FV3"
+      	[[[environment]]]
+		SUBDIR ="FV3"
 
     [[copy_cpl_fixed_files<ldate,mem>]]
-	    inherit = STAGE_FILES
-	    script = "bash stage_model_files.sh"
-	    [[[environment]]]
-		    SUBDIR ="CPL"
+    	inherit = STAGE_FILES
+	script = "bash stage_model_files.sh"
+		[[[environment]]]
+	SUBDIR ="CPL"
 
     [[copy_mom6_fixed_files<ldate,mem>]]
 	    inherit = STAGE_FILES
-      script = "bash stage_model_files.sh"
-	    [[[environment]]]
+	    script = "bash stage_model_files.sh"
+	    	[[[environment]]]
 		    SUBDIR ="MOM6"
 
     [[copy_cice6_fixed_files<ldate,mem>]]
 	    inherit = STAGE_FILES
-      script = "bash stage_model_files.sh"
-	    [[[environment]]]
+	    script = "bash stage_model_files.sh"
+	    	[[[environment]]]
 		    SUBDIR ="CICE6"
 
     [[copy_ww3_fixed_files<ldate,mem>]]
 	    inherit = STAGE_FILES
 	    script = "bash stage_model_files.sh"
-      [[[environment]]]
-        SUBDIR ="WW3"
+	    	[[[environment]]]
+			SUBDIR ="WW3"
 
     [[copy_post_files<ldate,mem>]]
 	    inherit = STAGE_FILES
  	    script = "bash stage_model_files.sh"
-      [[[environment]]]
-        SUBDIR="POST"
+	    [[[environment]]]
+        	SUBDIR="POST"
 
     [[copy_ic_files<ldate,mem>]]
 	    inherit = STAGE_FILES
 	    script = "bash stage_ic_files.sh"
-      [[[environment]]]
-        SUBDIR="IC"
+	    	[[[environment]]]
+			SUBDIR="IC"
  
+    [[expand_templates<ldate,mem>]]
+        inherit = FILE_PATHS_ENV
+        script = "bash generate_model_files_from_templates.sh"
+
+    [[update_restart<ldate,mem>]]
+        inherit = FILE_PATHS_ENV
+        script = "bash update_for_restart.sh"
+    
     [[run_model<ldate,mem>]]
-	    inherit = FILE_PATHS_ENV
+      inherit = FILE_PATHS_ENV
       platform = stampede2
       execution time limit = PT25H
       script = "bash run_model.sh"
       [[[directives]]]
         --partition=skx-normal
         --account=TG-EES200015
-	      --nodes=11
-	      --ntasks-per-node=48
+	--nodes=11
+	--ntasks-per-node=48
         --mail-user = bcash@gmu.edu
-
-
-

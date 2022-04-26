@@ -36,6 +36,7 @@ sed -i "s/DDs/$DDs/g" diag_table
 #
 #echo "Edit input.nml"
 sed -i "s/ISEED_CA/$ISEED_CA/g" input.nml
+sed -i "s/ISEED_CA/$ISEED_CA/g" input.nml_restart
 #
 echo "Edit model_configure"
 sed -i "s/YYYYs/$YYYYs/g" model_configure
@@ -51,8 +52,8 @@ sed -i "s/DDs/$DDs/g" model_configure_restart
 if [[ -e ice_in ]]; then
         echo "Edit ice_in"
         sed -i "s/YYYYs/$YYYYs/g" ice_in
-#       sed -i "s/MMs/$MMs/g" ice_in
-#       sed -i "s/DDs/$DDs/g" ice_in
+        sed -i "s/MMs/$MMs/g" ice_in
+        sed -i "s/DDs/$DDs/g" ice_in
 fi
 #
 if [[ -e ww3_multi.inp ]]; then
